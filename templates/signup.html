@@ -434,9 +434,12 @@
 
       if (valid) {
         const btn = document.getElementById('signup-submit-btn');
-        btn.textContent = '🎉 Account created!';
+        btn.textContent = 'Authenticating...';
         btn.style.background = 'linear-gradient(135deg,#00d4ff,#0099bb)';
         btn.disabled = true;
+
+        // Send the payload to the Flask backend!
+        this.submit();
       }
     });
   </script>

@@ -1,13 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database.models import db, User
+from dotenv import load_dotenv
 import uuid
 import os
+
+load_dotenv()
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "Users.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'change-this-in-production'  # needed for session
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # needed for session
 
 db.init_app(app)
 
