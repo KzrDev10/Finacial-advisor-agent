@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — FinanceAI</title>
+  <meta name="description" content="Your FinanceAI intelligent dashboard." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       DASHBOARD SHELL
+    ═══════════════════════════════════════════════ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      background: var(--color-bg);
+      color: var(--color-white);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      height: 56px;
+      background: rgba(13, 17, 23, 0.95);
+      border-bottom: 1px solid var(--color-border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--color-white);
+    }
+
+    .topbar-logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-lime));
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: #000;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .topbar-email {
+      font-size: 0.8rem;
+      color: var(--color-grey-1);
+    }
+
+    .topbar-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      border: 1px solid rgba(57, 255, 110, 0.3);
+      background: rgba(57, 255, 110, 0.06);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--color-lime);
+      letter-spacing: 0.05em;
+    }
+
+    .topbar-badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--color-lime);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .topbar-logout {
+      font-size: 0.8rem;
+      color: var(--color-grey-1);
+      text-decoration: none;
+      padding: 0.35rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .topbar-logout:hover {
+      border-color: #ff5f5f;
+      color: #ff5f5f;
+    }
+
+    /* ── Main layout ── */
+    .dashboard-main {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ══════════════════════════════════════════════
+       LEFT PANEL — Stats + Charts
+    ══════════════════════════════════════════════ */
+    .left-panel {
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      border-right: 1px solid var(--color-border);
+      scrollbar-width: none;
+    }
+
+    .left-panel::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ── Section label ── */
+    .dash-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-grey-2);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Stats row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    .stat-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .stat-card:nth-child(1)::before {
+      background: linear-gradient(90deg, var(--color-accent), transparent);
+    }
+
+    .stat-card:nth-child(2)::before {
+      background: linear-gradient(90deg, var(--color-lime), transparent);
+    }
+
+    .stat-card:nth-child(3)::before {
+      background: linear-gradient(90deg, #7c3aed, transparent);
+    }
+
+    .stat-card:nth-child(4)::before {
+      background: linear-gradient(90deg, #fbbf24, transparent);
+    }
+
+    .stat-card-label {
+      font-size: 0.72rem;
+      color: var(--color-grey-1);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .stat-card-value {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-card-change {
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .stat-card-change.up {
+      color: var(--color-lime);
+    }
+
+    .stat-card-change.down {
+      color: #ff5f5f;
+    }
+
+    .stat-card-change.neutral {
+      color: var(--color-accent);
+    }
+
+    /* ── Chart card ── */
+    .chart-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .chart-card-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .chart-card-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+    }
+
+    .badge-lime {
+      color: var(--color-lime);
+      background: rgba(57, 255, 110, 0.1);
+      border: 1px solid rgba(57, 255, 110, 0.2);
+    }
+
+    .badge-cyan {
+      color: var(--color-accent);
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 160px;
+    }
+
+    /* ── Portfolio breakdown ── */
+    .portfolio-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+
+    .asset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+    }
+
+    .asset-item {
+      display: grid;
+      grid-template-columns: 10px 1fr auto auto;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .asset-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .asset-name {
+      font-size: 0.85rem;
+      color: var(--color-grey-1);
+    }
+
+    .asset-bar-wrap {
+      grid-column: 1 / -1;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .asset-bar {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    .asset-pct {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-white);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    .asset-chg {
+      font-size: 0.72rem;
+      font-weight: 700;
+      min-width: 44px;
+      text-align: right;
+    }
+
+    .asset-chg.up {
+      color: var(--color-lime);
+    }
+
+    .asset-chg.down {
+      color: #ff5f5f;
+    }
+
+    /* ── Quick actions ── */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .quick-btn {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0.85rem;
+      text-align: center;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      color: var(--color-grey-1);
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: rgba(0, 212, 255, 0.04);
+    }
+
+    .quick-btn-icon {
+      font-size: 1.3rem;
+    }
+
+    /* ══════════════════════════════════════════════
+       RIGHT PANEL — AI Chat
+    ══════════════════════════════════════════════ */
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-2);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .chat-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-lime));
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .chat-agent-name {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .chat-agent-status {
+      font-size: 0.7rem;
+      color: var(--color-lime);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .chat-status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--color-lime);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .chat-clear-btn {
+      font-size: 0.72rem;
+      color: var(--color-grey-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .chat-clear-btn:hover {
+      color: #ff5f5f;
+      background: rgba(255, 95, 95, 0.08);
+    }
+
+    /* ── Messages ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-border) transparent;
+    }
+
+    .message {
+      display: flex;
+      gap: 0.6rem;
+      animation: fadeUp 0.3s ease-out forwards;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+
+    .msg-avatar.ai {
+      background: linear-gradient(135deg, var(--color-accent), var(--color-lime));
+      color: #000;
+    }
+
+    .msg-avatar.user {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      color: var(--color-grey-1);
+    }
+
+    .msg-bubble {
+      max-width: 82%;
+      padding: 0.7rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .message.ai .msg-bubble {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-bottom-left-radius: 4px;
+      color: var(--color-white);
+    }
+
+    .message.user .msg-bubble {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 212, 255, 0.08));
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-bottom-right-radius: 4px;
+      color: var(--color-white);
+    }
+
+    .msg-bubble strong {
+      color: var(--color-lime);
+    }
+
+    .msg-bubble em {
+      color: var(--color-grey-1);
+      font-style: normal;
+      font-size: 0.8rem;
+    }
+
+    .msg-bubble code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+
+    .typing-dots {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      border-bottom-left-radius: 4px;
+      padding: 0.7rem 0.95rem;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-grey-1);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+
+      30% {
+        transform: translateY(-5px);
+        opacity: 1;
+      }
+    }
+
+    /* ── Suggestions ── */
+    .chat-suggestions {
+      padding: 0.5rem 1.25rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      flex-shrink: 0;
+      border-top: 1px solid var(--color-border);
+      scrollbar-width: none;
+    }
+
+    .chat-suggestions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .suggestion-chip {
+      flex-shrink: 0;
+      padding: 0.35rem 0.8rem;
+      border-radius: 100px;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      font-size: 0.75rem;
+      color: var(--color-grey-1);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: var(--font-primary);
+    }
+
+    .suggestion-chip:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    /* ── Input ── */
+    .chat-input-wrap {
+      padding: 0.85rem 1.25rem;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: 0.6rem;
+      flex-shrink: 0;
+      background: var(--color-bg-2);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0.7rem 1rem;
+      color: var(--color-white);
+      font-size: 0.875rem;
+      font-family: var(--font-primary);
+      outline: none;
+      resize: none;
+      max-height: 120px;
+      transition: border-color 0.25s;
+      line-height: 1.5;
+    }
+
+    .chat-input::placeholder {
+      color: var(--color-grey-2);
+    }
+
+    .chat-input:focus {
+      border-color: rgba(0, 212, 255, 0.4);
+    }
+
+    .chat-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--color-accent), #0099bb);
+      border: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      align-self: flex-end;
+      transition: all 0.25s;
+      font-size: 1rem;
+    }
+
+    .chat-send-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MINI CHARTS (pure CSS sparklines via canvas)
+    ═══════════════════════════════════════════════ */
+    canvas.sparkline {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .dashboard-main {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-panel {
+        display: none;
+      }
+
+      body {
+        overflow: auto;
+      }
+
+      .left-panel {
+        overflow: visible;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .stats-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ TOP BAR ══ -->
+  <header class="topbar">
+    <a href="/" class="topbar-logo">
+      <div class="topbar-logo-icon">F</div>
+      FinanceAI
+    </a>
+    <div class="topbar-right">
+      <div class="topbar-badge">
+        <span class="topbar-badge-dot"></span>
+        AI Active
+      </div>
+      <span class="topbar-email" id="user-email-display">{{ user_email }}</span>
+      <a href="{{ url_for('logout') }}" class="topbar-logout">Sign out</a>
+    </div>
+  </header>
+
+  <!-- ══ MAIN ══ -->
+  <div class="dashboard-main">
+
+    <!-- ════════════════════════════════════════
+         LEFT — Analytics panel
+    ════════════════════════════════════════ -->
+    <div class="left-panel">
+
+      <!-- Stats row -->
+      <div>
+        <div class="dash-label">Portfolio Overview</div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-label">Total Value</div>
+            <div class="stat-card-value" style="color:var(--color-accent);">£284,392</div>
+            <div class="stat-card-change up">↑ +£3,240 today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">YTD Return</div>
+            <div class="stat-card-value" style="color:var(--color-lime);">+18.4%</div>
+            <div class="stat-card-change up">↑ vs S&P +12.1%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">AI Risk Score</div>
+            <div class="stat-card-value" style="color:#7c3aed;">28/100</div>
+            <div class="stat-card-change neutral">Low risk</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Sharpe Ratio</div>
+            <div class="stat-card-value" style="color:#fbbf24;">2.41</div>
+            <div class="stat-card-change up">↑ Excellent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance chart -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">Portfolio Performance</div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span class="chart-card-badge badge-lime">+18.4% YTD</span>
+            <div style="display:flex;gap:0.35rem;">
+              <button class="quick-btn" style="padding:0.2rem 0.6rem;font-size:0.7rem;flex-direction:row;"
+                onclick="setRange(this,'1M')">1M</button>
+              <button class="quick-btn"
+                style="padding:0.2rem 0.6rem;font-size:0.7rem;flex-direction:row;border-color:var(--color-accent);color:var(--color-accent);"
+                onclick="setRange(this,'3M')">3M</button>
+              <button class="quick-btn" style="padding:0.2rem 0.6rem;font-size:0.7rem;flex-direction:row;"
+                onclick="setRange(this,'1Y')">1Y</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="perf-chart" class="sparkline"></canvas>
+        </div>
+      </div>
+
+      <!-- Asset breakdown + Market movers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+
+        <!-- Asset breakdown -->
+        <div class="portfolio-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">Asset Allocation</div>
+            <span class="chart-card-badge badge-cyan">5 assets</span>
+          </div>
+          <div class="asset-list">
+            <div>
+              <div class="asset-item">
+                <div class="asset-color" style="background:#00d4ff;"></div>
+                <span class="asset-name">US Equities</span>
+                <span class="asset-pct">45%</span>
+                <span class="asset-chg up">+2.1%</span>
+              </div>
+              <div class="asset-bar-wrap">
+                <div class="asset-bar" style="width:45%;background:#00d4ff;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="asset-item">
+                <div class="asset-color" style="background:#39ff6e;"></div>
+                <span class="asset-name">Tech Growth</span>
+                <span class="asset-pct">25%</span>
+                <span class="asset-chg up">+4.7%</span>
+              </div>
+              <div class="asset-bar-wrap">
+                <div class="asset-bar" style="width:25%;background:#39ff6e;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="asset-item">
+                <div class="asset-color" style="background:#7c3aed;"></div>
+                <span class="asset-name">Crypto</span>
+                <span class="asset-pct">15%</span>
+                <span class="asset-chg down">-1.3%</span>
+              </div>
+              <div class="asset-bar-wrap">
+                <div class="asset-bar" style="width:15%;background:#7c3aed;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="asset-item">
+                <div class="asset-color" style="background:#fbbf24;"></div>
+                <span class="asset-name">Bonds</span>
+                <span class="asset-pct">10%</span>
+                <span class="asset-chg up">+0.4%</span>
+              </div>
+              <div class="asset-bar-wrap">
+                <div class="asset-bar" style="width:10%;background:#fbbf24;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="asset-item">
+                <div class="asset-color" style="background:#f87171;"></div>
+                <span class="asset-name">Commodities</span>
+                <span class="asset-pct">5%</span>
+                <span class="asset-chg up">+1.8%</span>
+              </div>
+              <div class="asset-bar-wrap">
+                <div class="asset-bar" style="width:5%;background:#f87171;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market movers -->
+        <div class="portfolio-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">Market Movers</div>
+            <span class="chart-card-badge badge-lime">Live</span>
+          </div>
+          <div class="asset-list" id="market-movers">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick actions -->
+      <div>
+        <div class="dash-label">Ask the AI</div>
+        <div class="quick-actions">
+          <button class="quick-btn"
+            onclick="sendSuggestion('What is my risk profile if I am 27, investing for 15 years with a volatility comfort of 8?')">
+            <span class="quick-btn-icon">🧠</span>
+            Risk Profile
+          </button>
+          <button class="quick-btn"
+            onclick="sendSuggestion('Project my savings: £5000 now, £500/month, at 7% annual return for 5 years.')">
+            <span class="quick-btn-icon">📈</span>
+            Savings Growth
+          </button>
+          <button class="quick-btn" onclick="sendSuggestion('Project £2000 invested in AAPL stock over 12 months.')">
+            <span class="quick-btn-icon">📊</span>
+            Stock Projection
+          </button>
+          <button class="quick-btn" onclick="sendSuggestion('What is a Sharpe ratio and is mine good?')">
+            <span class="quick-btn-icon">💡</span>
+            Explain Metrics
+          </button>
+          <button class="quick-btn" onclick="sendSuggestion('How should I diversify my portfolio to reduce risk?')">
+            <span class="quick-btn-icon">🛡️</span>
+            Diversify
+          </button>
+          <button class="quick-btn"
+            onclick="sendSuggestion('Compare TSLA and MSFT stock projections for £1000 over 6 months.')">
+            <span class="quick-btn-icon">⚡</span>
+            Compare Stocks
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /left-panel -->
+
+    <!-- ════════════════════════════════════════
+         RIGHT — AI Chat
+    ════════════════════════════════════════ -->
+    <div class="chat-panel">
+
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-avatar">🤖</div>
+          <div>
+            <div class="chat-agent-name">FinanceAI Agent</div>
+            <div class="chat-agent-status">
+              <span class="chat-status-dot"></span>
+              Online · Gemini 1.5 Flash
+            </div>
+          </div>
+        </div>
+        <button class="chat-clear-btn" id="clear-btn" onclick="clearChat()">Clear chat</button>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <!-- Welcome message -->
+        <div class="message ai">
+          <div class="msg-avatar ai">F</div>
+          <div class="msg-bubble">
+            👋 Hi! I'm your FinanceAI advisor. I can help you with:<br><br>
+            • <strong>Risk profiling</strong> — understand your investment style<br>
+            • <strong>Savings projections</strong> — see how your money grows<br>
+            • <strong>Stock analysis</strong> — live data-backed projections<br>
+            • <strong>Financial Q&A</strong> — any finance questions you have<br><br>
+            What would you like to explore today?
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestion chips -->
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button class="suggestion-chip" onclick="sendSuggestion(this.textContent)">What's my risk profile?</button>
+        <button class="suggestion-chip" onclick="sendSuggestion(this.textContent)">Project my savings growth</button>
+        <button class="suggestion-chip" onclick="sendSuggestion(this.textContent)">Analyse NVDA stock</button>
+        <button class="suggestion-chip" onclick="sendSuggestion(this.textContent)">Explain compound interest</button>
+        <button class="suggestion-chip" onclick="sendSuggestion(this.textContent)">How to reduce portfolio
+          risk?</button>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" class="chat-input" placeholder="Ask anything about your finances…" rows="1"
+          aria-label="Chat input"></textarea>
+        <button class="chat-send-btn" id="send-btn" aria-label="Send message">➤</button>
+      </div>
+
+    </div><!-- /chat-panel -->
+
+  </div><!-- /dashboard-main -->
+
+  <script>
+    /* ══════════════════════════════════════════════
+       PERFORMANCE CHART
+    ══════════════════════════════════════════════ */
+    const perfCanvas = document.getElementById('perf-chart');
+    const perfCtx = perfCanvas.getContext('2d');
+
+    const datasets = {
+      '1M': [240000, 244000, 241000, 247000, 252000, 249000, 255000, 258000, 262000, 260000, 265000, 270000, 268000, 272000, 276000, 274000, 279000, 282000, 284392],
+      '3M': [220000, 225000, 230000, 228000, 235000, 240000, 238000, 245000, 250000, 248000, 255000, 260000, 258000, 265000, 270000, 268000, 274000, 278000, 284392],
+      '1Y': [180000, 190000, 185000, 195000, 205000, 200000, 212000, 220000, 215000, 225000, 235000, 230000, 242000, 252000, 248000, 258000, 268000, 276000, 284392],
+    };
+
+    let currentRange = '3M';
+
+    function drawChart(data) {
+      const W = perfCanvas.offsetWidth;
+      const H = perfCanvas.offsetHeight;
+      perfCanvas.width = W * window.devicePixelRatio;
+      perfCanvas.height = H * window.devicePixelRatio;
+      perfCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      const min = Math.min(...data) * 0.998;
+      const max = Math.max(...data) * 1.002;
+      const pts = data.map((v, i) => ({
+        x: (i / (data.length - 1)) * W,
+        y: H - ((v - min) / (max - min)) * H * 0.85 - H * 0.075,
+      }));
+
+      // Area fill
+      const grad = perfCtx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, 'rgba(0,212,255,0.15)');
+      grad.addColorStop(1, 'rgba(0,212,255,0)');
+      perfCtx.beginPath();
+      perfCtx.moveTo(pts[0].x, H);
+      pts.forEach(p => perfCtx.lineTo(p.x, p.y));
+      perfCtx.lineTo(pts[pts.length - 1].x, H);
+      perfCtx.closePath();
+      perfCtx.fillStyle = grad;
+      perfCtx.fill();
+
+      // Line
+      const lineGrad = perfCtx.createLinearGradient(0, 0, W, 0);
+      lineGrad.addColorStop(0, '#00d4ff');
+      lineGrad.addColorStop(1, '#39ff6e');
+      perfCtx.beginPath();
+      perfCtx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2;
+        const my = (pts[i].y + pts[i + 1].y) / 2;
+        perfCtx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+      }
+      perfCtx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+      perfCtx.strokeStyle = lineGrad;
+      perfCtx.lineWidth = 2.5;
+      perfCtx.lineJoin = 'round';
+      perfCtx.stroke();
+
+      // End dot
+      const last = pts[pts.length - 1];
+      perfCtx.beginPath();
+      perfCtx.arc(last.x, last.y, 5, 0, Math.PI * 2);
+      perfCtx.fillStyle = '#39ff6e';
+      perfCtx.fill();
+    }
+
+    function setRange(btn, range) {
+      currentRange = range;
+      document.querySelectorAll('.chart-card button').forEach(b => {
+        b.style.borderColor = '';
+        b.style.color = '';
+      });
+      btn.style.borderColor = 'var(--color-accent)';
+      btn.style.color = 'var(--color-accent)';
+      drawChart(datasets[range]);
+    }
+
+    setTimeout(() => drawChart(datasets['3M']), 100);
+    window.addEventListener('resize', () => drawChart(datasets[currentRange]));
+
+    /* ══════════════════════════════════════════════
+       MARKET MOVERS
+    ══════════════════════════════════════════════ */
+    const movers = [
+      { sym: 'AAPL', price: '$198.42', chg: '+1.24%', up: true },
+      { sym: 'NVDA', price: '$875.10', chg: '+3.82%', up: true },
+      { sym: 'TSLA', price: '$248.66', chg: '+2.17%', up: true },
+      { sym: 'BTC', price: '$67,320', chg: '-0.94%', up: false },
+      { sym: 'ETH', price: '$3,480', chg: '-1.31%', up: false },
+      { sym: 'MSFT', price: '$415.22', chg: '+0.68%', up: true },
+    ];
+
+    const moverEl = document.getElementById('market-movers');
+    movers.forEach(m => {
+      moverEl.innerHTML += `
+        <div class="asset-item" style="grid-template-columns:auto 1fr auto auto;">
+          <div class="asset-color" style="background:${m.up ? 'var(--color-lime)' : '#ff5f5f'};"></div>
+          <span class="asset-name">${m.sym}</span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--color-white);">${m.price}</span>
+          <span class="asset-chg ${m.up ? 'up' : 'down'}">${m.chg}</span>
+        </div>`;
+    });
+
+    /* ══════════════════════════════════════════════
+       CHAT
+    ══════════════════════════════════════════════ */
+    const messagesEl = document.getElementById('chat-messages');
+    const inputEl = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    // Auto-grow textarea
+    inputEl.addEventListener('input', () => {
+      inputEl.style.height = 'auto';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+    });
+
+    // Send on Enter (Shift+Enter for newline)
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    function appendMessage(role, text) {
+      const msg = document.createElement('div');
+      msg.className = `message ${role}`;
+      const initial = role === 'ai' ? 'F' : '👤';
+      // Render **bold** and *italic* style markers simply
+      const formatted = text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/_(.+?)_/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+      msg.innerHTML = `
+        <div class="msg-avatar ${role}">${initial}</div>
+        <div class="msg-bubble">${formatted}</div>`;
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function showTyping() {
+      const t = document.createElement('div');
+      t.className = 'message ai';
+      t.id = 'typing';
+      t.innerHTML = `
+        <div class="msg-avatar ai">F</div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>`;
+      messagesEl.appendChild(t);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function removeTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
+    }
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      appendMessage('user', text);
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      sendBtn.disabled = true;
+      showTyping();
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        });
+        const data = await res.json();
+        removeTyping();
+        appendMessage('ai', data.response || data.error || 'Something went wrong.');
+      } catch (err) {
+        removeTyping();
+        appendMessage('ai', 'Network error — please try again.');
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+
+    function sendSuggestion(text) {
+      inputEl.value = text;
+      inputEl.dispatchEvent(new Event('input'));
+      sendMessage();
+    }
+
+    async function clearChat() {
+      await fetch('/api/chat/clear', { method: 'POST' });
+      messagesEl.innerHTML = `
+        <div class="message ai">
+          <div class="msg-avatar ai">F</div>
+          <div class="msg-bubble">
+            Chat cleared! How can I help you today?
+          </div>
+        </div>`;
+    }
+  </script>
+</body>
+
+</html>
